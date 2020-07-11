@@ -25,7 +25,7 @@ namespace Microsoft.Health.Fhir.CosmosDb.Features.Storage
     public class CosmosContainerProvider : IStartable, IRequireInitializationOnFirstRequest, IDisposable
     {
         private readonly ILogger<CosmosContainerProvider> _logger;
-        private Lazy<Container> _container;
+        private Func<Container> _containerFactory;
         private readonly RetryableInitializationOperation _initializationOperation;
         private readonly CosmosClient _client;
 
@@ -43,17 +43,15 @@ namespace Microsoft.Health.Fhir.CosmosDb.Features.Storage
             EnsureArg.IsNotNull(collectionInitializers, nameof(collectionInitializers));
             _logger = logger;
 
-            string collectionId = collectionConfiguration.Get(Constants.CollectionConfigurationName).CollectionId;
             _client = cosmosClientInitializer.CreateCosmosClient(cosmosDataStoreConfiguration);
 
             _initializationOperation = new RetryableInitializationOperation(
                 () => cosmosClientInitializer.InitializeDataStore(_client, cosmosDataStoreConfiguration, collectionInitializers));
 
-            _container = new Lazy<Container>(() => cosmosClientInitializer.CreateFhirContainer(
+            _containerFactory = () => cosmosClientInitializer.CreateFhirContainer(
                 _client,
                 cosmosDataStoreConfiguration.DatabaseId,
-                collectionId,
-                cosmosDataStoreConfiguration.ContinuationTokenSizeLimitInKb));
+                collectionConfiguration.Get(Constants.CollectionConfigurationName).CollectionId);
         }
 
         public Container Container
@@ -67,7 +65,7 @@ namespace Microsoft.Health.Fhir.CosmosDb.Features.Storage
 #pragma warning restore CA1065
                 }
 
-                return _container.Value;
+                return _containerFactory.Invoke();
             }
         }
 
@@ -102,7 +100,7 @@ namespace Microsoft.Health.Fhir.CosmosDb.Features.Storage
             if (disposing)
             {
                 _client.Dispose();
-                _container = null;
+                _containerFactory = null;
             }
         }
 
