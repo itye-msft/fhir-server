@@ -120,7 +120,7 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
 
             // Ask to get all patient with specific tag order by birthdate (timestamp)
             // filter and sort are different based on different types
-            await ExecuteAndValidateBundle($"Patient?_tag={tag}&_sort=birthdate", false, patients.Reverse().Cast<Resource>().ToArray());
+            await ExecuteAndValidateBundle($"Patient?_tag={tag}&_sort=birthdate", false, patients.Cast<Resource>().ToArray());
         }
 
         [Fact]
