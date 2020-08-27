@@ -72,8 +72,9 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
             await ExecuteAndValidateBundle($"Patient?_tag={tag}&_sort=-_lastUpdated", false, patients.Reverse().Cast<Resource>().ToArray());
         }
 
-        [Fact]
-        public async Task GivenQueryWithNoFilter_WhenSearchedWithSortParam_ThenPatientsAreReturnedInAscendingOrder()
+        // uncomment only when db cleanup happens on each run, otherwise the paging might cause expected resources to not arrive
+        /*[Fact]
+        public async Task GivenQueryWithNoFilter_WhenSearchedWithSortParam_ThenResourcesAreReturnedInAscendingOrder()
         {
             var tag = Guid.NewGuid().ToString();
             var patients = await CreateResources(tag);
@@ -84,10 +85,10 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
             // we overcome this issue by not looking for specific results, rather just make sure they are
             // sorted.
             await ExecuteAndValidateBundleSuperset($"Patient?_sort=birthdate", false, patients.Cast<Resource>().ToArray());
-        }
+        }*/
 
         [Fact]
-        public async Task GivenQueryWithDatetimeFilter_WhenSearchedWithSortParamOnDatetime_ThenPatientsAreReturnedInAscendingOrder()
+        public async Task GivenQueryWithDatetimeFilter_WhenSearchedWithSortParamOnDatetime_ThenResourcesAreReturnedInAscendingOrder()
         {
             var tag = Guid.NewGuid().ToString();
 
@@ -110,7 +111,7 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
         }
 
         [Fact]
-        public async Task GivenQueryWithTagFilter_WhenSearchedWithSortParamOnDatetime_ThenPatientsAreReturnedInAscendingOrder()
+        public async Task GivenQueryWithTagFilter_WhenSearchedWithSortParamOnDatetime_ThenResourcesAreReturnedInAscendingOrder()
         {
             var tag = Guid.NewGuid().ToString();
 
@@ -123,7 +124,7 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
         }
 
         [Fact]
-        public async Task GivenQueryWithMultipleFilters_WhenSearchedWithSortParamOnDatetime_ThenPatientsAreReturnedInAscendingOrder()
+        public async Task GivenQueryWithMultipleFilters_WhenSearchedWithSortParamOnDatetime_ThenResourcesAreReturnedInAscendingOrder()
         {
             var tag = Guid.NewGuid().ToString();
 
