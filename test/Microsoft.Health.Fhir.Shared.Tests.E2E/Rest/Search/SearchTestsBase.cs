@@ -4,6 +4,7 @@
 // -------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -137,10 +138,21 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
             Assert.NotEmpty(bundle.Entry.Select(e => e.Resource));
 
             // make sure the returned result contains all of the expected item
-            // maybe some more items...
-            Assert.Subset(
-                bundle.Entry.Select(e => e.Resource).ToHashSet(),
-                expectedResources.Select(er => er).ToHashSet());
+            // and maybe some more items (if the db is not empty, if we didn't use tag to filter) ...
+            var set = new HashSet<string>();
+            foreach (var r in bundle.Entry)
+            {
+                set.Add(r.Resource.Id);
+            }
+
+            foreach (var r in expectedResources)
+            {
+                Assert.Contains(r.Id, set);
+            }
+
+            // make sure items are sorted
+            var expectedList = expectedResources.OrderBy(x => ((Patient)x).BirthDate);
+            Assert.True(expectedList.SequenceEqual(expectedResources));
         }
     }
 }

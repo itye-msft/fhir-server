@@ -94,6 +94,7 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
 
             // save the timestamp prior to creating the resources
             var now = DateTime.Now;
+            var time = now.AddSeconds(-1);
 
             // create the resources which will have an timestamp bigger than the 'now' var
             var patients = await CreateResources(tag);
@@ -106,8 +107,8 @@ namespace Microsoft.Health.Fhir.Tests.E2E.Rest.Search
 
             // Format the time to fit yyyy-MM-ddTHH:mm:ss.fffffffzzz, and encode its special characters.
             // sort and filter are based on same type (datetime)
-            string lastUpdated = HttpUtility.UrlEncode($"{now:o}");
-            await ExecuteAndValidateBundleSuperset($"Patient?birthdate=gt{lastUpdated}&_sort=birthdate", false, patients.Cast<Resource>().ToArray());
+            string lastUpdated = HttpUtility.UrlEncode($"{time:o}");
+            await ExecuteAndValidateBundleSuperset($"Patient?_lastUpdated=gt{lastUpdated}&_sort=birthdate", false, patients.Cast<Resource>().ToArray());
         }
 
         [Fact]
